@@ -1,17 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { registerNewUser, updateUser } from "../redux/actions/userActions";
-import { Navigate } from "react-router-dom";
+import { updateUser } from "../redux/actions/userActions";
+import { useNavigate } from "react-router-dom";
 import moment from "moment";
 
 export default function UpdateScreen() {
-  if (!localStorage.getItem("currentUser")) {
-    window.location.href = "/";
-  }
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/");
+    }
+  }, []);
+
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
 
   const [name, setName] = useState(currentUser.name);
   const [email, setEmail] = useState(currentUser.email);
@@ -34,14 +38,11 @@ export default function UpdateScreen() {
       dob: dob,
       bio: bio,
     };
-    dispatch(updateUser(currentUser._id, updateduser));
+    dispatch(updateUser(currentUser._id, updateduser,navigate));
   };
 
   return (
     <div className="row d-flex justify-content-center mt-4">
-      {error && <h1>Something went Wrong</h1>}
-      {loading && <h1>Loading...</h1>}
-      {success && (window.location.href = "/")}
       <form
         onSubmit={(e) => RegisterUser(e)}
         className="card shadow p-3 bg-body rounded col-md-3"

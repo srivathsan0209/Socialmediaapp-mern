@@ -2,24 +2,29 @@ import React, { useEffect } from "react";
 import Post from "../components/Post";
 import { useSelector, useDispatch } from "react-redux";
 import { getFeedPostsByUsername } from "../redux/actions/postActions";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+  let followingUsersLists = currentUser?.following;
+  
+  useEffect(() => {
+    if(!currentUser){
+      toast.warning("Login to continue");
+      navigate("/login");
+    }
+    else{
+      dispatch(getFeedPostsByUsername(followingUsersLists));
+    }
+  }, []);
 
   let totalPosts = [];
   let totalUsers = [];
-
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  if (!currentUser) {
-    window.location.href = "/login";
-  }
-
-  let followingUsersLists = currentUser.following;
-
-  useEffect(() => {
-    dispatch(getFeedPostsByUsername(followingUsersLists));
-  }, [dispatch]);
-
   let postsListDetails = [];
 
   const postsState = useSelector(
@@ -42,14 +47,14 @@ export default function HomeScreen() {
 
   return (
     <div>
-      {!posts && <h1>Loading</h1>}
-      <h1 className="mt-3">Hi {currentUser.name}</h1>
+      {!posts && <Loader />}
+      <h1 className="mt-3">Hi {currentUser?.name}</h1>
       <div className="feed">
         {posts && postsListDetails.length === 0 && (
           <h1>Follow Users to see their posts</h1>
         )}
         {postsListDetails.map((postDetails, index) => {
-          if (postDetails.postedby !== currentUser.username) {
+          if (postDetails.postedby !== currentUser?.username) {
             return (
               <Post
                 key={postDetails._id}

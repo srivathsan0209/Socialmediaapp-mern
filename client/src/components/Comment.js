@@ -10,7 +10,7 @@ export default function Comment({ comments }) {
         {/* <button className="btn btn-sm">reply</button> */}
       </div>
       {/* <p>{comments.replies}</p> */}
-      {comments.replies.map((reply, index) => {
+      {comments.replies?.map((reply, index) => {
         return (
           <div key={index}>
             &nbsp;<b>{reply.id}</b> {reply.comments}

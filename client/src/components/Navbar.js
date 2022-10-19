@@ -1,7 +1,11 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../redux/actions/userActions";
 
 export default function Navbar() {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+  const dispatch = useDispatch();
 
   return (
     <div>
@@ -90,8 +94,7 @@ export default function Navbar() {
                     <li
                       className="dropdown-item"
                       onClick={() => {
-                        localStorage.clear();
-                        window.location.reload();
+                        dispatch(logoutUser())
                       }}
                     >
                       Logout

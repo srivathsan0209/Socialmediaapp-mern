@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 import { changePassword, deleteUser } from "../redux/actions/userActions";
 
 export default function SettingsScreen() {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
 
-  if (!localStorage.getItem("currentUser")) {
-    window.location.href = "/login";
-  }
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/login");
+    }
+  }, []);
 
   const dispatch = useDispatch();
 
@@ -68,25 +72,6 @@ export default function SettingsScreen() {
 
   return (
     <div className="row">
-      <div style={{ display: "none" }}>
-        {changeError && (
-          <div>
-            {toast.error("Wrong Password")}
-            {setTimeout(() => {
-              window.location.reload();
-            }, 1500)}
-          </div>
-        )}
-        {changeLoading && toast.info("Loading")}
-        {changeSuccess && (
-          <div>
-            {toast.success("Password Updated Successfully")}
-            {setTimeout(() => {
-              window.location.reload();
-            }, 1500)}
-          </div>
-        )}
-      </div>
       <h1>Settings</h1>
       <div className="col-md-6">
         <button

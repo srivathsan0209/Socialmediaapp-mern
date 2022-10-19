@@ -1,23 +1,25 @@
-import React, { useState } from "react";
-// import { UserMock } from "../mocks/UserMock";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, Navigate } from "react-router-dom";
-import { loginUser } from "../redux/actions/userActions";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { loginUser } from "../redux/actions/userActions";
 
 export default function LoginScreen() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+  useEffect(() => {
+    if(currentUser){
+      toast.warning("User Already Logged In");
+      navigate("/");
+    }
+  }, []);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const loginState = useSelector((state) => state.loginUserReducer);
-  const { loginSuccess, loginError, loginLoading } = loginState;
-
-  // if (localStorage.getItem("currentUser")) {
-    // toast.success("Login Success");
-    // window.location.href = "/";
-  // }
 
   const validateCredentials = (e) => {
     e.preventDefault();
@@ -32,10 +34,6 @@ export default function LoginScreen() {
 
   return (
     <div className="row d-flex justify-content-center">
-      <div style={{ display: "none" }}>
-        {loginError && toast.error("Login Failed")}
-        {loginLoading && toast.info("Loading")}
-      </div>
       <h1 className="mb-5 mt-5">Social Media App</h1>
       <form
         className="card shadow p-3 bg-body rounded col-md-3"

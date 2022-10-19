@@ -1,29 +1,29 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Post from "../components/Post";
 import { getPostByUsername } from "../redux/actions/postActions";
 import { getUserByUsername } from "../redux/actions/userActions";
 
 export default function PostsScreen() {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  const { username } = useParams();
-  if (!currentUser) {
-    // window.location.href = "/login";
-  }
 
-  if(!username && currentUser){
-    window.location.href = `/profile/${currentUser.username}/posts`;
-  }
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+  const { username } = useParams();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getPostByUsername(username));
+    if(!username && currentUser){
+      navigate(`/profile/${currentUser.username}/posts`);
+    }
+    else{
+      dispatch(getPostByUsername(username));
     if (!currentUser || (!currentUser.following.includes(username))) {
       dispatch(getUserByUsername(username));
     }
+    }
   }, []);
-
-  const dispatch = useDispatch();
 
   const postsState = useSelector((state) => state.getPostByUsernameReducer);
   let { posts } = postsState;

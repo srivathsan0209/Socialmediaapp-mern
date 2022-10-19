@@ -2,7 +2,6 @@ import moment from "moment";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 import {
   addComment,
   deletePost,
@@ -20,36 +19,28 @@ export default function Post({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // if(postDetails._id!==postid)
     dispatch(getPostAndUserById(postid));
-  }, [dispatch]);
+  }, [postid]);
 
   const postState = useSelector((state) => state.getPostAndUserByIdReducer);
   let { postDetails, userDetails } = postState;
 
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
 
   const [userComment, setUserComment] = useState("");
-
-  const likedpostState = useSelector((state) => state.likePostReducer);
-  const { userProfile, post } = likedpostState;
-
-  const deletepostState = useSelector((state) => state.deletePostReducer);
-  const { deleteSuccess, deleteError } = deletepostState;
+  const [isliked, setIsliked] = useState("");
+  const [likedList, setLikedList] = useState([]);
+  const [postComments, setPostComments] = useState([]);
 
   if (postDetails && !totalPosts.includes(postDetails)) {
     totalPosts.push(postDetails);
     totalUsers.push(userDetails);
   }
-
-  if (userProfile && post) {
-    localStorage.setItem("currentUser", JSON.stringify(userProfile));
-    sessionStorage.removeItem("likedpostid");
-    window.location.reload();
-  }
-
-  if (deleteSuccess) {
-    toast.success("Post Deleted Successfully");
+  
+  if(totalPosts[index] && isliked===""){
+    setIsliked(totalPosts[index]?.likes?.includes(currentUser?.username));
+    setLikedList(totalPosts[index].likes);
+    setPostComments(totalPosts[index].comments)
   }
 
   const likeunLikePost = () => {
@@ -63,10 +54,17 @@ export default function Post({
       dispatch(
         likePost(currentUser.username, totalPosts[index]._id, currentUser._id)
       );
+      setIsliked(!isliked);
+      if (likedList.includes(currentUser.username)) {
+        const usernameIndex = likedList.indexOf(currentUser.username);
+        likedList.splice(usernameIndex, 1);
+      } else if (!likedList.includes(currentUser.username) ) {
+        likedList.push(currentUser.username);
+      }
     }
   };
 
-  const commentOnClick = () => {
+  const commentOnClick = (postid) => {
     if (!currentUser) {
       Swal.fire({
         icon: "error",
@@ -75,7 +73,7 @@ export default function Post({
     } else if (currentUser.username === totalPosts[index].postedby) {
       Swal.fire({
         icon: "error",
-        title: "You can't comment on your own post",
+        title: "Sorry! \n You can't comment on your own post",
       });
     } else if (!currentUser.following.includes(totalPosts[index].postedby)) {
       Swal.fire({
@@ -85,15 +83,18 @@ export default function Post({
     } else {
       sessionStorage.setItem("commentedpostid", totalPosts[index]._id);
     }
-    // console.log(totalPosts[index]._id);
   };
 
-  const commentAction = () => {
+  const commentAction = (e) => {
+    const commentModel = {
+      username: currentUser.username,
+      comment: userComment,
+    };
+    postComments.push(commentModel);
     const postid = sessionStorage.getItem("commentedpostid");
     dispatch(addComment(currentUser.username, postid, userComment));
+    setUserComment("");
     sessionStorage.removeItem("commentedpostid");
-    toast.success("Comment Added Successfully");
-    window.location.reload();
   };
 
   const DeleteAction = () => {
@@ -115,9 +116,8 @@ export default function Post({
           const userlikedpostsIndex = currentUser.likedPosts.indexOf(postid);
           currentUser.likedPosts.splice(userlikedpostsIndex, 1);
         }
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        sessionStorage.setItem("currentUser", JSON.stringify(currentUser));
         window.location.reload();
-        toast.success("Post Deleted Successfully");
         sessionStorage.removeItem("optionpostid");
       }
     });
@@ -192,8 +192,7 @@ export default function Post({
                   onClick={likeunLikePost}
                   style={{ backgroundColor: "transparent", border: "none" }}
                 >
-                  {currentUser &&
-                  totalPosts[index].likes.includes(currentUser.username) ? (
+                  {isliked ? (
                     <svg
                       aria-label="Unlike"
                       className="_ab6-"
@@ -231,7 +230,7 @@ export default function Post({
                       : "null"
                   }
                   style={{ backgroundColor: "transparent", border: "none" }}
-                  onClick={commentOnClick}
+                  onClick={() => commentOnClick(totalPosts[index]._id)}
                 >
                   <svg
                     aria-label="Comment"
@@ -255,10 +254,10 @@ export default function Post({
               </div>
               <div className="card-text card me-5 mt-2 mb-2">
                 <div className="inline-flex ms-1">
-                Liked by : <b>{totalPosts[index].likes.length}</b> People
+                Liked by : <b>{likedList.length}</b> People
                 </div>
-                {totalPosts[index] &&
-                  totalPosts[index].likes.map((username, index) => {
+                {
+                  likedList?.map((username, index) => {
                     return (
                       <div key={index} className="mt-1 ms-1">
                         <a
@@ -275,7 +274,7 @@ export default function Post({
                 <b className="fs-5 ms-1 me-1">{totalUsers[index].name}</b>{" "}
                 {totalPosts[index].userComment}
               </p>
-              {totalPosts[index].comments.map((comment, index) => {
+              {postComments.map((comment, index) => {
                 return <Comment key={index} comments={comment} />;
               })}
               <p className="card-text">
@@ -299,7 +298,7 @@ export default function Post({
                 className="btn-close"
                 data-bs-dismiss="modal"
                 onClick={() => {
-                  localStorage.removeItem("commentedpostid");
+                  sessionStorage.removeItem("commentedpostid");
                 }}
               ></button>
             </div>

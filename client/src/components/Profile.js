@@ -1,8 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Profile({ profile }) {
   return (
-    <a
+    <Link
       href={`/profile/${profile.username}`}
       style={{ textDecoration: "none", color: "black" }}
     >
@@ -29,6 +30,6 @@ export default function Profile({ profile }) {
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

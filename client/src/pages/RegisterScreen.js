@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { registerNewUser } from "../redux/actions/userActions";
-import { Link, Navigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 import moment from "moment";
 
 export default function RegisterScreen() {
-  if (localStorage.getItem("currentUser")) {
-    window.location.href = "/";
-  }
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!(sessionStorage.getItem("currentUser"))) {
+      navigate("/");
+    }
+  }, []);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,8 +26,6 @@ export default function RegisterScreen() {
   const [cpassword, setCpassword] = useState("");
 
   const registerstate = useSelector((state) => state.registerNewUserReducer);
-
-  const { registerLoading, registererror, registersuccess,registerErrorMsg } = registerstate;
 
   const RegisterUser = (e) => {
     e.preventDefault();
@@ -38,7 +39,7 @@ export default function RegisterScreen() {
         bio: bio,
         password: password,
       };
-      dispatch(registerNewUser(user));
+      dispatch(registerNewUser(user,navigate));
     } else {
       Swal.fire({
         icon: "error",
@@ -49,16 +50,6 @@ export default function RegisterScreen() {
 
   return (
     <div className="row d-flex justify-content-center mt-4">
-      <div style={{ display: "none" }}>
-        {registererror && toast.error(registerErrorMsg)}
-        {registerLoading && toast.info("Loading")}
-        {registersuccess && (
-          <div>
-            <Navigate to="/login" replace={true} />
-            {toast.success("Registration Success")}
-          </div>
-        )}
-      </div>
       <form
         onSubmit={(e) => RegisterUser(e)}
         className="card shadow p-3 bg-body rounded col-md-3"

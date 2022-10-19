@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Loader from "../components/Loader";
 import Profile from "../components/Profile";
 import { getAllUsersByUsername } from "../redux/actions/userActions";
-import { toast } from "react-toastify";
 
 export default function SearchScreen() {
-  // if(!localStorage.getItem("currentUser")){
-  //   window.location.href="/login"
-  // }
 
   const [username, setusername] = useState("");
 
@@ -23,13 +20,7 @@ export default function SearchScreen() {
   };
   return (
     <div>
-      <div style={{ display: "none" }}>
-        {searchAllError && toast.error("Serach Failed")}
-        {searchAllLoading &&
-          toast.info("Loading", {
-            autoClose: 1000,
-          })}
-      </div>
+      {searchAllLoading && <Loader />}
       <h1 className="mt-4">Search User</h1>
       <div
         className="row d-flex justify-content-center"

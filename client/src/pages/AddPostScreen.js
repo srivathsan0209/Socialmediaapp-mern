@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { addNewPost } from "../redux/actions/postActions";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function AddPostScreen() {
   const [imageUrl, setImageUrl] = useState("");
@@ -10,19 +11,14 @@ export default function AddPostScreen() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  if (!currentUser) {
-    window.location.href = "/login";
-  }
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
 
-  const addpostState = useSelector((state) => state.addNewPostReducer);
-  const { profile, error, loading, } = addpostState;
-
-  if(profile){
-    localStorage.setItem("currentUser",JSON.stringify(profile)); 
-    // navigate("/posts") 
-    window.location.href="/posts"
-  }
+  useEffect(() => {
+    if(!currentUser){
+      toast.warn("Login to continue");
+      navigate("/login");
+    }
+  }, [])
 
   const addPost = (e) => {
     e.preventDefault();
@@ -33,7 +29,7 @@ export default function AddPostScreen() {
       _id:currentUser._id,
       posts:currentUser.posts
     };
-    dispatch(addNewPost(postDetails));
+    dispatch(addNewPost(postDetails,navigate));
   };
 
   return (

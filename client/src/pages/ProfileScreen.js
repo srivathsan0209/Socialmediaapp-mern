@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { followUser, getUserByUsername } from "../redux/actions/userActions";
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 
 export default function ProfileScreen() {
   const { username } = useParams();
@@ -13,34 +12,34 @@ export default function ProfileScreen() {
 
   let userLogged = false;
   let editProfile = false;
-  let buttonname = "follow";
+  const [buttonName, setButtonName] = useState("");
 
   useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+    const currentUser = JSON.parse(sessionStorage.getItem("currentUser")) || {};
 
     if (currentUser.username !== username) {
       dispatch(getUserByUsername(username));
     }
-  }, [dispatch, username]);
+  }, [username]);
 
-  if (localStorage.getItem("currentUser")) {
+  if (sessionStorage.getItem("currentUser")) {
     userLogged = true;
   }
 
   const profileState = useSelector((state) => state.getUserByUsernameReducer);
   let { profile, error, loading } = profileState;
 
-  const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser")) || {};
 
-  if (userLogged && currentUser.following.includes(username)) {
-    buttonname = "unfollow";
+  if (buttonName==="") {
+    setButtonName(currentUser?.following?.includes(username)? "unfollow" : "follow")
   }
 
-  if (currentUser.username === username) {
+  if (currentUser?.username === username) {
     editProfile = true;
   }
 
-  if (currentUser.username === username) {
+  if (currentUser?.username === username) {
     profile = currentUser;
   }
 
@@ -48,21 +47,14 @@ export default function ProfileScreen() {
   const { currentUserUpdated, profileUpdated } = followUserState;
 
   if (currentUserUpdated) {
-    localStorage.setItem("currentUser", JSON.stringify(currentUserUpdated));
-    toast.success("Action Success");
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  }
-
-  if (followUserState.error) {
-    toast.error("Something Went Wrong");
+    sessionStorage.setItem("currentUser", JSON.stringify(currentUserUpdated));
   }
 
 
   const follow = (e) => {
     if (userLogged) {
       dispatch(followUser(currentUser, profile, username));
+      setButtonName(buttonName==="follow"?"unfollow" : "follow")
     } else {
       Swal.fire({
         icon: "error",
@@ -78,14 +70,6 @@ export default function ProfileScreen() {
   return (
     <div>
       <div className="card mt-5 me-5 ms-5">
-        <div style={{display:"none"}}>
-          {error &&
-            toast.error("Something Went Wrong Please try after Sometime")}
-          {loading &&
-            toast.info("Loading...", {
-              autoClose: 500,
-            })}
-        </div>
         {profile && (
           <div className="mt-5 row">
             <div className="col-md-4 text-end mt-2">
@@ -147,7 +131,7 @@ export default function ProfileScreen() {
                 follow(e);
               }}
             >
-              {buttonname}
+              {buttonName}
             </button>
           )}
         </div>

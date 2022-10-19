@@ -1,13 +1,18 @@
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-export const addNewPost = (postDetails) => (dispatch) => {
+export const addNewPost = (postDetails,navigate) => (dispatch) => {
   dispatch({ type: "ADD_POST_REQUEST" });
-
+  toast.info("loading");
   axios
     .post("/api/posts/addpost", postDetails)
     .then((res) => {
+      toast.success("Post Added Successfully");
       dispatch({ type: "ADD_POST_SUCCESS", payload: res.data });
       console.log(res);
+      sessionStorage.setItem("currentUser",JSON.stringify(res.data))
+      navigate("/posts")
     })
     .catch((error) => {
       dispatch({ type: "ADD_POST_FAILED" }, error);
@@ -66,6 +71,7 @@ export const addComment = (username, postid, comment) => (dispatch) => {
   axios
     .post("/api/posts/addcomment", { username, postid, comment })
     .then((res) => {
+      toast.success("Comment Added Successfully");
       dispatch({ type: "ADD_COMMENT_SUCCESS", payload: res.data });
       console.log(res);
     })
@@ -86,6 +92,8 @@ export const likePost = (username, postid, userid) => (dispatch) => {
         post: res.data.post,
         user: res.data.user,
       });
+      sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+      sessionStorage.removeItem("likedpostid")
       // dispatch(getUserByUsername(username));
       console.log(res.data.post);
     })
@@ -97,7 +105,7 @@ export const likePost = (username, postid, userid) => (dispatch) => {
 
 export const getlikedPosts = (likedPostsList) => (dispatch) => {
   dispatch({ type: "GET_LIKEDPOSTS_REQUEST" });
-
+  toast.info("Loading Posts");
   axios
     .post("/api/posts/getuserlikedposts", { likedPostsList })
     .then((res) => {
@@ -114,6 +122,7 @@ export const deletePost = (postid, username) => (dispatch) => {
   axios
     .post("/api/posts/deletepost", { postid, username })
     .then((res) => {
+      toast.success("Post Deleted Successfully");
       dispatch({ type: "DELETE_POST_SUCCESS" });
       console.log(res);
     })
