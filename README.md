@@ -9,6 +9,7 @@ To run the app in Development Mode.
     - Create a Database inside the Project.
     - Under Database Access Add a new Database User using any of the Authentication Method.
     - Add the URL inside the .env file with variable name MONGODB_SECRET_URL= mongodb+srv://<Username>:<Password>@CustomURL/DBName
+    - Check the sample file .env.sample
 
 # 1 To Switch on the Backend Server
 
