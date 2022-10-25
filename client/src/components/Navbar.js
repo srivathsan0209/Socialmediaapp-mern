@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import { logoutUser } from "../redux/actions/userActions";
 
 export default function Navbar() {
@@ -11,9 +12,9 @@ export default function Navbar() {
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
-          <a className="navbar-brand" href="/">
+          <Link className="navbar-brand" to="/">
             Social Media
-          </a>
+          </Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -29,32 +30,32 @@ export default function Navbar() {
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
                 {currentUser ? (
-                  <a
+                  <Link
                     className="nav-link"
-                    href={`/profile/${currentUser.username}/posts`}
+                    to={`/profile/${currentUser.username}/posts`}
                   >
                     Posts
-                  </a>
+                  </Link>
                 ) : (
-                  <a className="nav-link" href={`/posts`}>
+                  <Link className="nav-link" to={`/posts`}>
                     Posts
-                  </a>
+                  </Link>
                 )}
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="/search">
+                <Link className="nav-link" to="/search">
                   Search
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="/addpost">
+                <Link className="nav-link" to="/addpost">
                   Add a Post
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="/likedPost">
+                <Link className="nav-link" to="/likedPost">
                   Liked Posts
-                </a>
+                </Link>
               </li>
             </ul>
             {currentUser ? (
@@ -79,17 +80,17 @@ export default function Navbar() {
                     aria-labelledby="navbarDropdownMenuLink"
                   >
                     <li>
-                      <a
+                      <Link
                         className="dropdown-item"
-                        href={`/profile/${currentUser.username}`}
+                        to={`/profile/${currentUser.username}`}
                       >
                         Profile
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/settings">
+                      <Link className="dropdown-item" to="/settings">
                         Settings
-                      </a>
+                      </Link>
                     </li>
                     <li
                       className="dropdown-item"
@@ -105,9 +106,9 @@ export default function Navbar() {
             ) : (
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 <li className="nav-item">
-                  <a className="nav-link" href="/login">
+                  <Link className="nav-link" to="/login">
                     Login
-                  </a>
+                  </Link>
                 </li>
               </ul>
             )}

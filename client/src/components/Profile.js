@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function Profile({ profile }) {
   return (
     <Link
-      href={`/profile/${profile.username}`}
+      to={`/profile/${profile.username}`}
       style={{ textDecoration: "none", color: "black" }}
     >
       <div

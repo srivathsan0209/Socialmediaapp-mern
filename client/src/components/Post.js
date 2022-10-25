@@ -13,7 +13,7 @@ import Comment from "./Comment";
 export default function Post({
   postid,
   totalPosts,
-  index,
+  postIndex,
   totalUsers,
 }) {
   const dispatch = useDispatch();
@@ -31,13 +31,32 @@ export default function Post({
   const [isliked, setIsliked] = useState("");
   const [likedList, setLikedList] = useState([]);
   const [postComments, setPostComments] = useState([]);
+  const [index, setIndex] = useState();
 
-  if (postDetails && !totalPosts.includes(postDetails)) {
-    totalPosts.push(postDetails);
-    totalUsers.push(userDetails);
+  const postExist = (postDetails) => {
+    totalPosts.map((post) => {
+      if(post._id.toString() == postDetails._id.toString()){
+        return true;
+      }
+    })
+    return false;
   }
+
+  useEffect(() => {
+      if(postDetails && (postExist(postDetails)===false)){
+        totalPosts.push(postDetails);
+        totalUsers.push(userDetails);
+        console.log("totalPosts1",totalPosts);
+        console.log("totalPosts2",postDetails);
+        totalPosts.map((post,index1) => {
+          if(post._id.toString() == postid){
+            setIndex(index1);
+          }
+        })
+      }
+  }, [postDetails])
   
-  if(totalPosts[index] && isliked===""){
+  if(totalPosts?.[index] && isliked===""){
     setIsliked(totalPosts[index]?.likes?.includes(currentUser?.username));
     setLikedList(totalPosts[index].likes);
     setPostComments(totalPosts[index].comments)
@@ -125,7 +144,7 @@ export default function Post({
 
   return (
     <div>
-      {totalPosts[index] && (
+      {totalPosts?.[index] && (
         <div className="row d-flex justify-content-center mt-3">
           <div className="col-md-4 card mb-3 mt-3 align-items-center row">
             <div className="mb-3 mt-3 row inline-flex">
