@@ -11,7 +11,7 @@ export default function RegisterScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!(sessionStorage.getItem("currentUser"))) {
+    if (sessionStorage.getItem("currentUser")) {
       navigate("/");
     }
   }, []);
